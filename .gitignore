@@ -1,0 +1,7 @@
+node_modules
+dist
+*.log
+*.tsbuildinfo
+release
+*.keystore
+keystore.properties
