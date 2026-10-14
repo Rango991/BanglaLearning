@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { phraseKey, units } from '../content';
 import { norm } from '../engine/text';
-import { BnText, capital, Say } from '../components/ui';
+import { BnText, capital, Rich, Say } from '../components/ui';
 import { useStore } from '../store';
 
 /** Every phrase in the course, searchable, with audio: a pocket phrasebook for real conversations. */
@@ -9,6 +9,7 @@ export function Phrasebook() {
   const { progress } = useStore();
   const [q, setQ] = useState('');
   const [learnedOnly, setLearnedOnly] = useState(false);
+  const [view, setView] = useState<'phrases' | 'grammar'>('phrases');
   const query = norm(q);
 
   const sections = useMemo(
@@ -25,9 +26,54 @@ export function Phrasebook() {
     [query, learnedOnly, progress.phrases],
   );
 
+  const toggle = (
+    <div className="seg">
+      <button type="button" className={view === 'phrases' ? 'on' : ''} onClick={() => setView('phrases')}>
+        💬 Phrases
+      </button>
+      <button type="button" className={view === 'grammar' ? 'on' : ''} onClick={() => setView('grammar')}>
+        💡 Grammar notes
+      </button>
+    </div>
+  );
+
+  if (view === 'grammar') {
+    return (
+      <div className="page">
+        <h2>📖 Phrasebook</h2>
+        {toggle}
+        <p className="small muted">Every tip from the lessons in one place. Handy before a phone call home.</p>
+        {units.map((unit) => {
+          const guides = unit.lessons.filter((l) => l.guide);
+          if (!guides.length) return null;
+          return (
+            <section key={unit.id} className="pb-section">
+              <h3 style={{ color: unit.colour }}>
+                {unit.emoji} {unit.title}
+              </h3>
+              {guides.map((l) => (
+                <details key={l.id} className="card grammar-card">
+                  <summary>
+                    <b>{l.guide!.title}</b>
+                  </summary>
+                  {l.guide!.body.map((line, i) => (
+                    <p key={i} className="small">
+                      <Rich text={line} />
+                    </p>
+                  ))}
+                </details>
+              ))}
+            </section>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="page">
       <h2>📖 Phrasebook</h2>
+      {toggle}
       <input className="search" placeholder="Search English, Bangla or Sylheti…" value={q} onChange={(e) => setQ(e.target.value)} />
       <label className="check-row small">
         <input type="checkbox" checked={learnedOnly} onChange={(e) => setLearnedOnly(e.target.checked)} /> Only phrases I've learned

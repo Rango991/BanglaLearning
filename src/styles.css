@@ -294,3 +294,17 @@ input, select { font: inherit; }
 .welcome-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; font-weight: 700; }
 .welcome-list li { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 10px 14px; }
 .confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+/* ---------- v1.1 additions ---------- */
+.offer-card { background: #eef6ff; border-color: #c5ddf8; }
+.code-box { width: 100%; min-height: 84px; margin-top: 10px; border: 2px solid var(--line); border-radius: 12px; padding: 10px; font-family: monospace; font-size: 0.75rem; word-break: break-all; user-select: text; -webkit-user-select: text; background: #fffdf9; }
+.time-input { border: 2px solid var(--line); border-radius: 10px; padding: 6px 8px; background: #fff; }
+.seg { display: flex; background: #ece6dc; border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 12px; }
+.seg button { flex: 1; border: none; background: none; border-radius: 10px; padding: 9px; font-weight: 800; color: var(--muted); }
+.seg button.on { background: #fff; color: var(--green-dark); box-shadow: 0 2px 0 var(--line); }
+.grammar-card summary { cursor: pointer; list-style: none; }
+.grammar-card summary::after { content: ' ▾'; color: var(--muted); }
+.grammar-card[open] summary { margin-bottom: 8px; }
+.chat-say { background: #fff; border: 2px solid #a6e3c7; border-radius: 16px; padding: 12px; }
+.chat-say-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+.mic.small-mic { width: 64px; height: 64px; font-size: 1.8rem; flex: none; }

@@ -112,3 +112,17 @@ describe('progress', () => {
     expect(p.phrases['bhalo achi'].box).toBe(1);
   });
 });
+
+describe('backup codes', () => {
+  it('round-trips progress, including non-ASCII text', async () => {
+    const { backupCode, restoreCode } = await import('../src/engine/progress');
+    const p = applyResult(defaultProgress(), { lessonId: 'hello-1', outcomes: { 'bhalo achi': true }, xp: 15, minutes: 4 }, '2026-03-03');
+    const code = backupCode({ ...p, settings: { ...p.settings, reminderTime: '০৭:৩০' } });
+    const back = restoreCode(`  ${code.slice(0, 20)}\n${code.slice(20)} `);
+    expect(back?.xp).toBe(15);
+    expect(back?.lessons['hello-1']).toBe(1);
+    expect(back?.settings.reminderTime).toBe('০৭:৩০');
+    expect(restoreCode('nonsense')).toBeNull();
+    expect(restoreCode('KOTHA1:!!!')).toBeNull();
+  });
+});

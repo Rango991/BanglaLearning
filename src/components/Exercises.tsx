@@ -39,6 +39,8 @@ export interface ExerciseProps {
   onDone(r: SelfResult): void;
   onCantListen(): void;
   onCantSpeak(): void;
+  /** Ask the learner to say their chosen role-play replies out loud. */
+  chatSpeak: boolean;
 }
 
 export function ExerciseView(props: ExerciseProps) {
@@ -65,7 +67,7 @@ export function ExerciseView(props: ExerciseProps) {
     case 'speak':
       return <Speak key={ex.id} p={ex.p} onDone={props.onDone} onCantSpeak={props.onCantSpeak} />;
     case 'chat':
-      return <ChatView key={ex.id} chat={ex.chat} onDone={props.onDone} />;
+      return <ChatView key={ex.id} chat={ex.chat} onDone={props.onDone} speakReplies={props.chatSpeak} onCantSpeak={props.onCantSpeak} />;
   }
 }
 
@@ -349,12 +351,14 @@ function Match({ pairs, right, onDone }: { pairs: Phrase[]; right: string[]; onD
 
 // ---------- speaking ----------
 
-function Speak({ p, onDone, onCantSpeak }: { p: Phrase; onDone(r: SelfResult): void; onCantSpeak(): void }) {
-  const [state, setState] = useState<'idle' | 'listening' | 'good' | 'bad' | 'error'>('idle');
+type SpeechState = 'idle' | 'listening' | 'good' | 'bad' | 'error';
+
+/** Listen for the learner saying a Bengali phrase and mark it. */
+function useSpeechAttempt(bn: string) {
+  const [state, setState] = useState<SpeechState>('idle');
   const [heard, setHeard] = useState('');
   const [message, setMessage] = useState('');
   const [tries, setTries] = useState(0);
-  useAutoPlay(p.bn, p.ro);
   useEffect(() => () => stopListening(), []);
 
   const start = async () => {
@@ -367,7 +371,7 @@ function Speak({ p, onDone, onCantSpeak }: { p: Phrase; onDone(r: SelfResult): v
     setHeard('');
     try {
       const matches = await listen();
-      const result = speechMatches(p.bn, matches);
+      const result = speechMatches(bn, matches);
       setHeard(result.best);
       setTries((t) => t + 1);
       if (result.ok) {
@@ -389,6 +393,17 @@ function Speak({ p, onDone, onCantSpeak }: { p: Phrase; onDone(r: SelfResult): v
       );
     }
   };
+  const reset = () => {
+    setState('idle');
+    setHeard('');
+    setTries(0);
+  };
+  return { state, heard, message, tries, start, reset };
+}
+
+function Speak({ p, onDone, onCantSpeak }: { p: Phrase; onDone(r: SelfResult): void; onCantSpeak(): void }) {
+  const { state, heard, message, tries, start } = useSpeechAttempt(p.bn);
+  useAutoPlay(p.bn, p.ro);
 
   return (
     <div className="ex">
@@ -445,8 +460,53 @@ function Speak({ p, onDone, onCantSpeak }: { p: Phrase; onDone(r: SelfResult): v
 
 // ---------- role-play chat ----------
 
-function ChatView({ chat, onDone }: { chat: Chat; onDone(r: SelfResult): void }) {
+/** After picking the right reply, say it out loud before the conversation moves on. */
+function SayReply({ line, onDone, onCantSpeak }: { line: ChatLine; onDone(): void; onCantSpeak(): void }) {
+  const { state, heard, message, tries, start } = useSpeechAttempt(line.bn);
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    if (state === 'good') {
+      const t = setTimeout(() => done.current(), 700);
+      return () => clearTimeout(t);
+    }
+  }, [state]);
+  return (
+    <div className="chat-say pop-up">
+      <div className="small muted">Now say it out loud:</div>
+      <div className="chat-say-row">
+        <button type="button" className={`mic small-mic ${state}`} onClick={start} disabled={state === 'listening' || state === 'good'} aria-label="Speak">
+          {state === 'listening' ? '👂' : state === 'good' ? '✅' : '🎤'}
+        </button>
+        <div className="grow">
+          <div className="msg-ro">{line.ro}</div>
+          <div className="small">
+            {state === 'idle' && <span className="muted">Tap the mic, then speak</span>}
+            {state === 'listening' && 'Listening…'}
+            {state === 'good' && <span className="good-text">Sounded great!</span>}
+            {state === 'bad' && <span className="bad-text">Not quite. Listen and try again{heard ? ` (I heard: ${heard})` : ''}</span>}
+            {state === 'error' && message}
+          </div>
+        </div>
+        <Say bn={line.bn} />
+      </div>
+      <div className="row gap">
+        {(tries >= 2 || state === 'error') && state !== 'good' && (
+          <button type="button" className="btn ghost small-btn" onClick={onDone}>
+            Skip
+          </button>
+        )}
+        <button type="button" className="btn link small" onClick={onCantSpeak}>
+          🔇 Can't speak now
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ChatView({ chat, onDone, speakReplies, onCantSpeak }: { chat: Chat; onDone(r: SelfResult): void; speakReplies: boolean; onCantSpeak(): void }) {
   const [shown, setShown] = useState(0); // lines revealed
+  const [saying, setSaying] = useState(false);
   const [mistakes, setMistakes] = useState(0);
   const [wrongPick, setWrongPick] = useState<{ ro: string; en: string } | null>(null);
   const [reveal, setReveal] = useState<Set<number>>(new Set());
@@ -486,7 +546,8 @@ function ChatView({ chat, onDone }: { chat: Chat; onDone(r: SelfResult): void })
       triedThisLine.current = false;
       setWrongPick(null);
       void speak(current.bn);
-      setShown((s) => s + 1);
+      if (speakReplies) setSaying(true);
+      else setShown((s) => s + 1);
     } else {
       sfx.wrong();
       triedThisLine.current = true;
@@ -520,7 +581,22 @@ function ChatView({ chat, onDone }: { chat: Chat; onDone(r: SelfResult): void })
         ))}
         <div ref={bottom} />
       </div>
-      {current?.who === 'you' && (
+      {current?.who === 'you' && saying && (
+        <SayReply
+          key={shown}
+          line={current}
+          onDone={() => {
+            setSaying(false);
+            setShown((s) => s + 1);
+          }}
+          onCantSpeak={() => {
+            setSaying(false);
+            setShown((s) => s + 1);
+            onCantSpeak();
+          }}
+        />
+      )}
+      {current?.who === 'you' && !saying && (
         <div className="chat-choices pop-up">
           <div className="small muted">Your reply:</div>
           {options.map((o) => (

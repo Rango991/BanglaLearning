@@ -19,6 +19,14 @@ export interface Settings {
   rate: number;
   /** XP per day to hit the daily goal. */
   goal: number;
+  /** Daily practice reminder notification. */
+  reminder: boolean;
+  /** Reminder time, "HH:MM" in local time. */
+  reminderTime: string;
+  /** Whether we've already offered the reminder, so we only ask once. */
+  reminderAsked: boolean;
+  /** In role-plays, say your reply out loud after choosing it. */
+  chatSpeak: boolean;
 }
 
 export interface Progress {
@@ -43,7 +51,7 @@ export const defaultProgress = (): Progress => ({
   phrases: {},
   days: {},
   minutes: {},
-  settings: { script: false, speak: true, sound: true, rate: 0.9, goal: 30 },
+  settings: { script: false, speak: true, sound: true, rate: 0.9, goal: 30, reminder: false, reminderTime: '19:00', reminderAsked: false, chatSpeak: true },
 });
 
 const KEY = 'kotha-progress-v1';
@@ -57,6 +65,32 @@ export function load(): Progress {
     return { ...base, ...saved, settings: { ...base.settings, ...saved.settings } };
   } catch {
     return defaultProgress();
+  }
+}
+
+const BACKUP_PREFIX = 'KOTHA1:';
+
+/** A copy-and-paste code holding all progress, for moving phones or reinstalling. */
+export function backupCode(p: Progress): string {
+  const bytes = new TextEncoder().encode(JSON.stringify(p));
+  let bin = '';
+  bytes.forEach((b) => (bin += String.fromCharCode(b)));
+  return BACKUP_PREFIX + btoa(bin);
+}
+
+/** Reads a backup code. Returns null if it isn't a valid Kotha backup. */
+export function restoreCode(code: string): Progress | null {
+  try {
+    const clean = code.trim().replace(/\s+/g, '');
+    if (!clean.startsWith(BACKUP_PREFIX)) return null;
+    const bin = atob(clean.slice(BACKUP_PREFIX.length));
+    const json = new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+    const saved = JSON.parse(json) as Partial<Progress>;
+    if (saved.version !== 1 || typeof saved.xp !== 'number' || typeof saved.lessons !== 'object') return null;
+    const base = defaultProgress();
+    return { ...base, ...saved, started: true, settings: { ...base.settings, ...saved.settings } };
+  } catch {
+    return null;
   }
 }
 

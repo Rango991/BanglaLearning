@@ -139,6 +139,22 @@ let activeWeb: WebRecognition | null = null;
 
 /** Listen for one Bangla utterance. Resolves with what the recogniser thinks was said. */
 export async function listen(): Promise<string[]> {
+  // Recognisers normally stop by themselves after a pause, but never let one hang.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      stopListening();
+      reject(new ListenError('nothing'));
+    }, 12000);
+  });
+  try {
+    return await Promise.race([listenOnce(), timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function listenOnce(): Promise<string[]> {
   if (native) {
     let perm = await SpeechRecognition.checkPermissions();
     if (perm.speechRecognition !== 'granted') perm = await SpeechRecognition.requestPermissions();

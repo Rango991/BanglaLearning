@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { addDays, dayKey, defaultProgress, streak } from '../engine/progress';
+import { addDays, backupCode, dayKey, defaultProgress, restoreCode, streak } from '../engine/progress';
+import { askReminderPermission } from '../reminders';
 import { Say } from '../components/ui';
 import { checkVoice, openVoiceInstall } from '../speech';
 import { Capacitor } from '@capacitor/core';
@@ -25,6 +26,10 @@ export function VoiceHelp() {
 export function Me({ voice, onVoiceChecked, micOk }: { voice?: boolean; onVoiceChecked(v: boolean): void; micOk: boolean }) {
   const { progress, updateSettings, update } = useStore();
   const [resetting, setResetting] = useState(false);
+  const [backup, setBackup] = useState('');
+  const [restoring, setRestoring] = useState(false);
+  const [pasted, setPasted] = useState('');
+  const [note, setNote] = useState('');
   const s = progress.settings;
   const today = dayKey();
   const week = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
@@ -125,10 +130,97 @@ export function Me({ voice, onVoiceChecked, micOk }: { voice?: boolean; onVoiceC
           <input type="checkbox" checked={s.speak && micOk} disabled={!micOk} onChange={(e) => updateSettings({ speak: e.target.checked })} />
         </label>
         <label className="setting">
+          <span>
+            Speak your replies in chats
+            <span className="small muted block">After picking a reply in a role-play, say it out loud</span>
+          </span>
+          <input type="checkbox" checked={s.chatSpeak && s.speak && micOk} disabled={!micOk || !s.speak} onChange={(e) => updateSettings({ chatSpeak: e.target.checked })} />
+        </label>
+        <label className="setting">
           <span>Sound effects</span>
           <input type="checkbox" checked={s.sound} onChange={(e) => updateSettings({ sound: e.target.checked })} />
         </label>
       </div>
+
+      {Capacitor.isNativePlatform() && (
+        <>
+          <h3>Reminders</h3>
+          <div className="card">
+            <label className="setting">
+              <span>
+                Daily reminder
+                <span className="small muted block">With a phrase of the day. Skips days you've hit your goal.</span>
+              </span>
+              <input
+                type="checkbox"
+                checked={s.reminder}
+                onChange={async (e) => {
+                  if (!e.target.checked) return updateSettings({ reminder: false, reminderAsked: true });
+                  const ok = await askReminderPermission();
+                  updateSettings({ reminder: ok, reminderAsked: true });
+                  if (!ok) setNote('Notifications are blocked. Allow them for Kotha in your phone settings.');
+                }}
+              />
+            </label>
+            {s.reminder && (
+              <label className="setting">
+                <span>Remind me at</span>
+                <input type="time" className="time-input" value={s.reminderTime} onChange={(e) => e.target.value && updateSettings({ reminderTime: e.target.value })} />
+              </label>
+            )}
+          </div>
+        </>
+      )}
+
+      <h3>Back up progress</h3>
+      <div className="card">
+        <p className="small muted">
+          Save this code somewhere safe (e.g. email it to yourself). Paste it back here after reinstalling or on a new phone to get your progress back.
+        </p>
+        <div className="row gap">
+          <button
+            type="button"
+            className="btn ghost small-btn"
+            onClick={async () => {
+              const code = backupCode(progress);
+              setBackup(code);
+              try {
+                await navigator.clipboard.writeText(code);
+                setNote('Backup code copied. Paste it somewhere safe.');
+              } catch {
+                setNote('Copy the code below and keep it somewhere safe.');
+              }
+            }}
+          >
+            📋 Copy backup code
+          </button>
+          <button type="button" className="btn ghost small-btn" onClick={() => setRestoring((r) => !r)}>
+            ♻️ Restore
+          </button>
+        </div>
+        {backup && <textarea className="code-box" readOnly value={backup} onFocus={(e) => e.target.select()} />}
+        {restoring && (
+          <>
+            <textarea className="code-box" placeholder="Paste your KOTHA1:… code here" value={pasted} onChange={(e) => setPasted(e.target.value)} />
+            <button
+              type="button"
+              className="btn success small-btn"
+              disabled={!pasted.trim()}
+              onClick={() => {
+                const restored = restoreCode(pasted);
+                if (!restored) return setNote("That code doesn't look right. Check you copied all of it.");
+                update(() => restored);
+                setRestoring(false);
+                setPasted('');
+                setNote(`Restored! ${restored.xp} XP and ${Object.keys(restored.phrases).length} phrases are back.`);
+              }}
+            >
+              Restore this code
+            </button>
+          </>
+        )}
+      </div>
+      {note && <p className="small center good-text">{note}</p>}
 
       <h3>About</h3>
       <div className="card small">

@@ -14,6 +14,7 @@ import { Me } from './screens/Me';
 import { Welcome } from './screens/Welcome';
 import { sfx } from './sound';
 import { canListen, checkVoice } from './speech';
+import { scheduleReminders } from './reminders';
 import { useStore } from './store';
 
 export type Tab = 'learn' | 'practice' | 'phrases' | 'me';
@@ -47,6 +48,11 @@ export function App() {
     void checkVoice().then(setVoice);
     void canListen().then(setMicOk);
   }, []);
+
+  // Re-plan the week's reminders whenever progress changes (e.g. today's goal is met).
+  useEffect(() => {
+    void scheduleReminders(progress);
+  }, [progress]);
 
   const abilities: Abilities = { speak: progress.settings.speak && micOk, listen: voice !== false };
   const learned = new Set(Object.keys(progress.lessons).filter((id) => progress.lessons[id] > 0));
@@ -120,7 +126,7 @@ export function App() {
   if (!progress.started) return <Welcome voice={voice} onVoiceChecked={setVoice} />;
 
   if (active) {
-    return <Session exercises={active.exercises} colour={active.colour} pool={active.pool} onExit={() => setActive(null)} onFinish={onFinish} />;
+    return <Session exercises={active.exercises} colour={active.colour} pool={active.pool} chatSpeak={abilities.speak && progress.settings.chatSpeak} onExit={() => setActive(null)} onFinish={onFinish} />;
   }
 
   if (result) return <Results info={result} goal={progress.settings.goal} onDone={() => setResult(null)} />;

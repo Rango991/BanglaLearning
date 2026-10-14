@@ -19,6 +19,8 @@ interface Props {
   exercises: Exercise[];
   colour: string;
   pool: Phrase[];
+  /** Ask for role-play replies to be spoken out loud. */
+  chatSpeak: boolean;
   onExit(): void;
   onFinish(s: SessionSummary): void;
 }
@@ -33,7 +35,8 @@ function fallback(ex: Exercise, pool: Phrase[]): Exercise {
   return makeExercise(tiles(ex.p.ro).length >= 2 ? 'build-bn' : 'pick-en', ex.p, pool);
 }
 
-export function Session({ exercises, colour, pool, onExit, onFinish }: Props) {
+export function Session({ exercises, colour, pool, chatSpeak: initialChatSpeak, onExit, onFinish }: Props) {
+  const [chatSpeak, setChatSpeak] = useState(initialChatSpeak);
   const [queue, setQueue] = useState(exercises);
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState<string | null>(null);
@@ -131,6 +134,7 @@ export function Session({ exercises, colour, pool, onExit, onFinish }: Props) {
     setQueue((q) => q.map((e, i) => (i >= idx && LISTENING.has(e.kind) ? fallback(e, pool) : e)));
   };
   const cantSpeak = () => {
+    setChatSpeak(false);
     setQueue((q) => q.map((e, i) => (i >= idx && e.kind === 'speak' ? fallback(e, pool) : e)));
   };
 
@@ -149,7 +153,7 @@ export function Session({ exercises, colour, pool, onExit, onFinish }: Props) {
 
       <div className="session-body">
         {retries.current.has(ex.id) && <div className="retry-tag">↺ Let's try that one again</div>}
-        <ExerciseView key={ex.id} ex={ex} locked={!!feedback} onChange={setAnswer} onDone={onDone} onCantListen={cantListen} onCantSpeak={cantSpeak} />
+        <ExerciseView key={ex.id} ex={ex} locked={!!feedback} onChange={setAnswer} onDone={onDone} onCantListen={cantListen} onCantSpeak={cantSpeak} chatSpeak={chatSpeak} />
       </div>
 
       {UNGRADED.has(ex.kind) && (

@@ -2,10 +2,11 @@ import type { Lesson, Phrase, Unit } from './types';
 import { unitsA } from './units-a';
 import { unitsB } from './units-b';
 import { unitsC } from './units-c';
+import { unitsD } from './units-d';
 
 export * from './types';
 
-export const units: Unit[] = [...unitsA, ...unitsB, ...unitsC];
+export const units: Unit[] = [...unitsA, ...unitsB, ...unitsC, ...unitsD];
 
 export interface LessonRef {
   unit: Unit;

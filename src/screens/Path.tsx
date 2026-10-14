@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { units, type Lesson, type Unit } from '../content';
 import { dayKey, streak } from '../engine/progress';
 import { Mascot, ProgressBar } from '../components/ui';
+import { askReminderPermission } from '../reminders';
+import { Capacitor } from '@capacitor/core';
 import { useStore } from '../store';
 
 export function Hud() {
@@ -28,6 +30,33 @@ export function Hud() {
 
 const OFFSETS = [0, 52, 76, 52, 0, -52, -76, -52];
 
+function ReminderOffer() {
+  const { progress, updateSettings } = useStore();
+  const done = Object.keys(progress.lessons).length;
+  if (!Capacitor.isNativePlatform() || progress.settings.reminderAsked || progress.settings.reminder || done < 2) return null;
+  return (
+    <div className="card offer-card pop-in">
+      <b>🔔 Want a daily nudge?</b>
+      <p className="small">A little reminder each evening with a phrase of the day. It skips days you've already hit your goal.</p>
+      <div className="row gap">
+        <button
+          type="button"
+          className="btn success small-btn"
+          onClick={async () => {
+            const ok = await askReminderPermission();
+            updateSettings({ reminderAsked: true, reminder: ok });
+          }}
+        >
+          Yes, at 7pm
+        </button>
+        <button type="button" className="btn ghost small-btn" onClick={() => updateSettings({ reminderAsked: true })}>
+          No thanks
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function Path({ onStart, next, voice, onFixVoice }: { onStart(id: string): void; next?: string; voice?: boolean; onFixVoice(): void }) {
   const { progress } = useStore();
   const [open, setOpen] = useState<string | null>(null);
@@ -42,6 +71,7 @@ export function Path({ onStart, next, voice, onFixVoice }: { onStart(id: string)
           <p className="small">Lessons need it to read phrases aloud. Tap to see how to switch it on (it takes a minute).</p>
         </div>
       )}
+      <ReminderOffer />
       {!Object.keys(progress.lessons).length && (
         <Mascot mood="cheer">
           <b>Assalamu alaikum!</b> You already speak Sylheti, so you're halfway there. Let's swap it for standard Bangla. Tap <b>Start</b>.
