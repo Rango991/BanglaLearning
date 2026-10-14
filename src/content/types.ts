@@ -18,6 +18,10 @@ export interface Phrase {
   syl?: string;
   /** A short note shown on the intro card and after answering. */
   tip?: string;
+  /** Casual or slang: fine with cousins and mates, not with elders. */
+  slang?: boolean;
+  /** Set on personalised copies so review history follows the original phrase. */
+  key?: string;
 }
 
 export interface ChatLine {

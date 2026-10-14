@@ -10,10 +10,12 @@ No writing required. You listen, tap word tiles, speak and role-play. Every phra
 
 ## What's in it
 
-- **20 units, 53 lessons, 380 phrases, 20 role-play chats:** greetings, about me, the Sylheti→Standard sound swaps, family, numbers and haggling, food, everyday verbs, plans (future), the past, rickshaws and directions, feelings and health, visiting relatives, phone calls home, telling the time and days, Eid and weddings, daily life and power cuts, weather and going out, linking words and opinions, polite requests, and life in the UK
+- **25 units, 63 lessons, 465 phrases, 25 role-play chats:** greetings, about me, the Sylheti→Standard sound swaps, family, numbers and haggling, food, everyday verbs, plans (future), the past, rickshaws and directions, feelings and health, visiting relatives, phone calls home, telling the time and days, Eid and weddings, daily life and power cuts, weather and going out, linking words and opinions, polite requests, life in the UK, all about you, Dhaka slang, shopping and colours, the doctor, and Ramadan
 - **Exercises:** intro cards with audio (🐢 slow mode), what does this mean, how do you say, listen and pick, build the sentence from tiles (Bangla and English), listen and tap what you hear, match pairs, Sylheti → Standard, speaking (Google speech recognition marks you), and chat role-plays where you pick the right reply. Wrong answers come back at the end of the lesson.
 - **Motivation:** XP, daily goal, streak, combo counter, confetti, and Bangla praise from Bagha the tiger
 - **Practice tab:** spaced repetition (back after 1, 3, 7, 14 and 30 days), plus listening-only, speaking-only and Sylheti-swap drills
+- **Personal:** set your name, age, city, family's home town, job, siblings and marital status (Me → Your profile) and the role-plays and an "All about you" unit use them, with your name spoken in Bangla
+- **Slang 🔥:** casual Dhaka phrases scattered through the course and a "Talk like a local" unit, each tagged so you know it's for mates, not elders
 - **Speak your replies:** in role-plays you say your chosen reply out loud before the conversation moves on
 - **Phrasebook:** every phrase, searchable in English, Bangla or Sylheti, with audio, plus all the grammar notes in one place
 - **Daily reminder** with a phrase of the day (skips days you've already hit your goal)

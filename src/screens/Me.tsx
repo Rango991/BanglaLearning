@@ -4,6 +4,8 @@ import { askReminderPermission } from '../reminders';
 import { Say } from '../components/ui';
 import { checkVoice, openVoiceInstall } from '../speech';
 import { Capacitor } from '@capacitor/core';
+import { CITIES, HOMES } from '../content';
+import { ProfileEditor } from './Profile';
 import { useStore } from '../store';
 
 export function VoiceHelp() {
@@ -23,8 +25,34 @@ export function VoiceHelp() {
   );
 }
 
-export function Me({ voice, onVoiceChecked, micOk }: { voice?: boolean; onVoiceChecked(v: boolean): void; micOk: boolean }) {
+export function Me({ voice, onVoiceChecked, micOk, editingProfile, setEditingProfile }: {
+  voice?: boolean;
+  onVoiceChecked(v: boolean): void;
+  micOk: boolean;
+  editingProfile: boolean;
+  setEditingProfile(v: boolean): void;
+}) {
   const { progress, updateSettings, update } = useStore();
+  const prof = progress.profile;
+
+  if (editingProfile) {
+    return (
+      <div className="page">
+        <h2>🪪 Your profile</h2>
+        <p className="muted">Role-plays and the "All about you" unit use these details, so the conversations are about your life.</p>
+        <div className="card">
+          <ProfileEditor
+            initial={prof}
+            onCancel={() => setEditingProfile(false)}
+            onSave={(profile) => {
+              update((p) => ({ ...p, profile }));
+              setEditingProfile(false);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
   const [resetting, setResetting] = useState(false);
   const [backup, setBackup] = useState('');
   const [restoring, setRestoring] = useState(false);
@@ -41,6 +69,16 @@ export function Me({ voice, onVoiceChecked, micOk }: { voice?: boolean; onVoiceC
   return (
     <div className="page">
       <h2>🐯 Your progress</h2>
+      <div className="card row" onClick={() => setEditingProfile(true)} role="button">
+        <span className="big-emoji">🪪</span>
+        <span className="grow">
+          <b>{prof ? prof.name : 'Your profile'}</b>
+          <span className="small muted block">
+            {prof ? `${prof.age} · ${CITIES[prof.city]?.en ?? prof.city} · family from ${HOMES[prof.home]?.en ?? prof.home}` : 'Add your details to make the role-plays about you'}
+          </span>
+        </span>
+        <span className="btn ghost small-btn">{prof ? 'Edit' : 'Set up'}</span>
+      </div>
       <div className="stat-row">
         <div className="stat orange">
           <div className="stat-label">Streak</div>

@@ -150,6 +150,8 @@ export interface LessonOptions extends Abilities {
   firstTime: boolean;
   /** Other known phrases, nearest first, used for wrong options and spare tiles. */
   pool: Phrase[];
+  /** On a replay, phrases not in here (added since) are taught first. */
+  isKnown?: (p: Phrase) => boolean;
   rand?: Rand;
 }
 
@@ -169,6 +171,12 @@ export function lessonSession(lesson: Lesson, opts: LessonOptions): Exercise[] {
     out.push(makeMatch(lesson.phrases, rand));
     out.push(...hardRound(lesson.phrases, pool, opts, rand).slice(0, 6));
   } else {
+    // Phrases added to the lesson since it was last done get taught first.
+    const fresh = opts.isKnown ? lesson.phrases.filter((p) => !opts.isKnown!(p)) : [];
+    fresh.forEach((p) => {
+      out.push(makeExercise('intro', p, pool, rand));
+      out.push(makeExercise('pick-en', p, pool, rand));
+    });
     out.push(makeMatch(lesson.phrases, rand));
     const first = hardRound(lesson.phrases, pool, opts, rand);
     const second = hardRound(lesson.phrases, pool, opts, rand);

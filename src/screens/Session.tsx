@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { phraseKey, type Phrase } from '../content';
 import { ExerciseView, type SelfResult } from '../components/Exercises';
-import { BnText, capital, cheer, ProgressBar, Rich, Say, SylBridge } from '../components/ui';
+import { BnText, capital, cheer, ProgressBar, Rich, Say, SlangTag, SylBridge } from '../components/ui';
 import { checkAnswer, makeExercise, type Exercise } from '../engine/session';
 import { tiles } from '../engine/text';
 import { sfx } from '../sound';
@@ -189,6 +189,7 @@ export function Session({ exercises, colour, pool, chatSpeak: initialChatSpeak, 
             <div>
               <BnText p={feedback.ex.p} className="large" />
               <div className="feedback-en">{capital(feedback.ex.p.en)}</div>
+              {feedback.ex.p.slang && <SlangTag />}
             </div>
           </div>
           {feedback.ex.p.syl && feedback.ex.kind !== 'sylheti' && <SylBridge syl={feedback.ex.p.syl} />}

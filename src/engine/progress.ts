@@ -29,6 +29,8 @@ export interface Settings {
   chatSpeak: boolean;
 }
 
+import type { Profile } from '../content/profile';
+
 export interface Progress {
   version: 1;
   started: boolean;
@@ -41,6 +43,8 @@ export interface Progress {
   /** Minutes studied per day. */
   minutes: Record<string, number>;
   settings: Settings;
+  /** The learner's details, used to personalise role-plays. */
+  profile?: Profile;
 }
 
 export const defaultProgress = (): Progress => ({

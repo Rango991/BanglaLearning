@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
-import { lessonById, lessonList, phraseByKey, type Phrase } from './content';
+import { lessonById, lessonList, personaliseLesson, personalisePhrase, phraseByKey, phraseKey, type Phrase, type Profile } from './content';
 import { dayKey, dueKeys, sessionXp, streak, weakestKeys } from './engine/progress';
 import { lessonSession, practiceSession, type Abilities, type Exercise, type PracticeMode } from './engine/session';
 import { shuffle } from './engine/text';
@@ -28,12 +28,12 @@ interface ActiveSession {
 }
 
 /** Phrases to draw wrong options and spare tiles from: same unit first, then everything already learned. */
-function poolFor(lessonId: string | undefined, learned: Set<string>): Phrase[] {
+function poolFor(lessonId: string | undefined, learned: Set<string>, profile: Profile | undefined): Phrase[] {
   const ref = lessonId ? lessonById.get(lessonId) : undefined;
   const sameUnit = ref ? ref.unit.lessons.flatMap((l) => l.phrases) : [];
   const learnedPhrases = lessonList.filter((r) => learned.has(r.lesson.id)).flatMap((r) => r.lesson.phrases);
   const rest = lessonList.flatMap((r) => r.lesson.phrases);
-  return [...new Set([...sameUnit, ...shuffle(learnedPhrases), ...shuffle(rest)])];
+  return [...new Set([...sameUnit, ...shuffle(learnedPhrases), ...shuffle(rest)])].map((p) => personalisePhrase(p, profile, phraseKey(p)));
 }
 
 export function App() {
@@ -43,6 +43,7 @@ export function App() {
   const [result, setResult] = useState<ResultInfo | null>(null);
   const [voice, setVoice] = useState<boolean | undefined>(undefined);
   const [micOk, setMicOk] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
 
   useEffect(() => {
     void checkVoice().then(setVoice);
@@ -72,8 +73,14 @@ export function App() {
   const startLesson = (lessonId: string) => {
     const ref = lessonById.get(lessonId);
     if (!ref) return;
-    const pool = poolFor(lessonId, learned);
-    const exercises = lessonSession(ref.lesson, { ...abilities, firstTime: !progress.lessons[lessonId], pool });
+    const pool = poolFor(lessonId, learned, progress.profile);
+    const lesson = personaliseLesson(ref.lesson, progress.profile, phraseKey);
+    const exercises = lessonSession(lesson, {
+      ...abilities,
+      firstTime: !progress.lessons[lessonId],
+      pool,
+      isKnown: (p) => !!progress.phrases[phraseKey(p)],
+    });
     setActive({ exercises, pool, colour: ref.unit.colour, lessonId, title: ref.lesson.title });
   };
 
@@ -86,9 +93,9 @@ export function App() {
     const due = dueKeys(progress.phrases).filter((k) => known.includes(k) && eligible(k));
     const weak = weakestKeys(progress.phrases).filter((k) => known.includes(k) && eligible(k) && !due.includes(k));
     const keys = [...due, ...weak].slice(0, mode === 'mixed' ? 10 : 8);
-    const targets = shuffle(keys.map((k) => phraseByKey.get(k)!.phrase));
+    const targets = shuffle(keys.map((k) => personalisePhrase(phraseByKey.get(k)!.phrase, progress.profile, k)));
     if (!targets.length) return;
-    const pool = poolFor(undefined, learned);
+    const pool = poolFor(undefined, learned, progress.profile);
     setActive({
       exercises: practiceSession(targets, pool, mode, abilities),
       pool,
@@ -136,10 +143,21 @@ export function App() {
   return (
     <div className="app">
       <main className="main">
-        {tab === 'learn' && <Path onStart={startLesson} next={nextLesson?.lesson.id} voice={voice} onFixVoice={() => setTab('me')} />}
+        {tab === 'learn' && (
+          <Path
+            onStart={startLesson}
+            next={nextLesson?.lesson.id}
+            voice={voice}
+            onFixVoice={() => setTab('me')}
+            onSetupProfile={() => {
+              setEditingProfile(true);
+              setTab('me');
+            }}
+          />
+        )}
         {tab === 'practice' && <Practice onStart={startPractice} canSpeak={abilities.speak} />}
         {tab === 'phrases' && <Phrasebook />}
-        {tab === 'me' && <Me voice={voice} onVoiceChecked={setVoice} micOk={micOk} />}
+        {tab === 'me' && <Me voice={voice} onVoiceChecked={setVoice} micOk={micOk} editingProfile={editingProfile} setEditingProfile={setEditingProfile} />}
       </main>
       <nav className="tabs">
         {(
@@ -150,7 +168,15 @@ export function App() {
             ['me', '🐯', 'Me'],
           ] as const
         ).map(([id, icon, label]) => (
-          <button key={id} type="button" className={`tab ${tab === id ? 'on' : ''}`} onClick={() => setTab(id)}>
+          <button
+            key={id}
+            type="button"
+            className={`tab ${tab === id ? 'on' : ''}`}
+            onClick={() => {
+              setEditingProfile(false);
+              setTab(id);
+            }}
+          >
             <span className="tab-icon">{icon}</span>
             <span className="tab-label">{label}</span>
           </button>

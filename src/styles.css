@@ -308,3 +308,20 @@ input, select { font: inherit; }
 .chat-say { background: #fff; border: 2px solid #a6e3c7; border-radius: 16px; padding: 12px; }
 .chat-say-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
 .mic.small-mic { width: 64px; height: 64px; font-size: 1.8rem; flex: none; }
+
+/* ---------- v1.2 additions ---------- */
+.slang-tag { display: inline-block; margin-top: 4px; background: #fff0f0; color: #c92a2a; border: 1.5px solid #ffc9c9; border-radius: 99px; padding: 1px 9px; font-size: 0.74rem; font-weight: 900; letter-spacing: 0.02em; }
+.profile-form { display: flex; flex-direction: column; gap: 4px; }
+.field { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.field:last-child { border-bottom: none; }
+.field > span { font-weight: 800; }
+.field input[type='text'], .field input[type='number'], .field select { border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #fff; width: 100%; user-select: text; -webkit-user-select: text; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 2px solid var(--line); background: #fff; border-radius: 99px; padding: 7px 14px; font-weight: 800; }
+.chip.on { border-color: #7fd3ad; background: var(--green-soft); color: var(--green-dark); }
+.stepper { display: flex; align-items: center; gap: 12px; }
+.stepper button { width: 38px; height: 38px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-weight: 900; font-size: 1.2rem; }
+.stepper b { min-width: 20px; text-align: center; font-size: 1.1rem; }
+.name-preview { display: flex; align-items: center; gap: 10px; }
+.name-preview .script { font-family: 'Noto Sans Bengali', sans-serif; font-size: 1.2rem; }
+.profile-card { background: #fff5f5; border-color: #ffc9c9; cursor: pointer; }

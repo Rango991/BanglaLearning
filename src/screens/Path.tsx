@@ -57,7 +57,13 @@ function ReminderOffer() {
   );
 }
 
-export function Path({ onStart, next, voice, onFixVoice }: { onStart(id: string): void; next?: string; voice?: boolean; onFixVoice(): void }) {
+export function Path({ onStart, next, voice, onFixVoice, onSetupProfile }: {
+  onStart(id: string): void;
+  next?: string;
+  voice?: boolean;
+  onFixVoice(): void;
+  onSetupProfile(): void;
+}) {
   const { progress } = useStore();
   const [open, setOpen] = useState<string | null>(null);
   let n = 0;
@@ -69,6 +75,12 @@ export function Path({ onStart, next, voice, onFixVoice }: { onStart(id: string)
         <div className="card warn-card" onClick={onFixVoice}>
           <b>🔇 No Bangla voice on this phone yet</b>
           <p className="small">Lessons need it to read phrases aloud. Tap to see how to switch it on (it takes a minute).</p>
+        </div>
+      )}
+      {!progress.profile && Object.keys(progress.lessons).length > 0 && (
+        <div className="card profile-card pop-in" onClick={onSetupProfile}>
+          <b>🪪 Make the role-plays about you</b>
+          <p className="small">Add your name, age, where you live and where your family's from. The conversations and a whole new unit will use them.</p>
         </div>
       )}
       <ReminderOffer />

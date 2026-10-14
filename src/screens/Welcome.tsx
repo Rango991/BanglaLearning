@@ -3,6 +3,7 @@ import { Mascot } from '../components/ui';
 import { checkVoice, speak } from '../speech';
 import { useStore } from '../store';
 import { VoiceHelp } from './Me';
+import { ProfileEditor } from './Profile';
 
 export function Welcome({ voice, onVoiceChecked }: { voice?: boolean; onVoiceChecked(v: boolean): void }) {
   const { updateSettings, update } = useStore();
@@ -79,10 +80,22 @@ export function Welcome({ voice, onVoiceChecked }: { voice?: boolean; onVoiceChe
             className="btn success big wide"
             onClick={() => {
               updateSettings({ goal });
-              update((p) => ({ ...p, started: true }));
+              setStep(3);
             }}
           >
-            Start learning
+            Next
+          </button>
+        </div>
+      )}
+      {step === 3 && (
+        <div className="pop-in">
+          <h2 className="center">Tell me about you</h2>
+          <p className="center muted">The role-plays will use your name, family and life, so the conversations feel like your own.</p>
+          <div className="card">
+            <ProfileEditor saveLabel="Start learning" onSave={(profile) => update((p) => ({ ...p, profile, started: true }))} />
+          </div>
+          <button type="button" className="btn link wide" onClick={() => update((p) => ({ ...p, started: true }))}>
+            Skip for now
           </button>
         </div>
       )}

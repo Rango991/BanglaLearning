@@ -3,10 +3,12 @@ import { unitsA } from './units-a';
 import { unitsB } from './units-b';
 import { unitsC } from './units-c';
 import { unitsD } from './units-d';
+import { unitsE } from './units-e';
 
 export * from './types';
+export * from './profile';
 
-export const units: Unit[] = [...unitsA, ...unitsB, ...unitsC, ...unitsD];
+export const units: Unit[] = [...unitsA, ...unitsB, ...unitsC, ...unitsD, ...unitsE];
 
 export interface LessonRef {
   unit: Unit;
@@ -22,6 +24,7 @@ export const lessonById = new Map(lessonList.map((ref) => [ref.lesson.id, ref]))
 
 /** Stable id for a phrase, used to track how well it's known. */
 export function phraseKey(p: Phrase): string {
+  if (p.key) return p.key;
   return p.ro.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, ' ').trim();
 }
 

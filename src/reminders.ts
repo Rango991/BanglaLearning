@@ -5,7 +5,7 @@
  */
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { allPhrases, phraseByKey } from './content';
+import { allPhrases, personalisePhrase, phraseByKey, phraseKey } from './content';
 import { dayKey, streak, type Progress } from './engine/progress';
 
 const native = Capacitor.isNativePlatform();
@@ -40,7 +40,8 @@ export async function scheduleReminders(p: Progress): Promise<void> {
     const notifications = IDS.flatMap((id, d) => {
       const at = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d, hour, minute);
       if (at <= now || (d === 0 && doneToday)) return [];
-      const ph = phraseFor(d + now.getDate());
+      const raw = phraseFor(d + now.getDate());
+      const ph = personalisePhrase(raw, p.profile, phraseKey(raw));
       return [
         {
           id,

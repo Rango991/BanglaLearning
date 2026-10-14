@@ -56,6 +56,7 @@ export const unitsB: Unit[] = [
           { bn: 'শেষ দাম কত?', ro: 'shesh dam koto?', en: "what's your final price?", alt: ['what is the final price?', "what's the last price?"] },
           { bn: 'আমি এটা নেবো', ro: 'ami eta nebo', en: "I'll take this", alt: ['i will take this', "i'll take this one"], syl: 'ami ita nimu' },
           { bn: 'ভাংতি আছে?', ro: 'bhangti ache?', en: 'do you have change?', alt: ['have you got change?'], syl: 'bangti ase?' },
+          { bn: 'একটা ফাউ দিন', ro: 'ekta fau din', en: 'throw in a freebie', alt: ['give me one free', 'give me a free one'], slang: true, tip: '**fau** means "for free". A classic market line once you\'ve agreed a price.' },
         ],
         chat: {
           with: 'A shopkeeper in New Market',
@@ -131,6 +132,7 @@ export const unitsB: Unit[] = [
           { bn: 'আমি মাংস খাই না', ro: 'ami mangsho khai na', en: "I don't eat meat", alt: ['i do not eat meat'] },
           { bn: 'খুব ঝাল', ro: 'khub jhal', en: 'very spicy', alt: ["it's very spicy", 'too spicy'] },
           { bn: 'বিলটা দিন', ro: 'bilta din', en: 'the bill please', alt: ['can i have the bill?', 'give me the bill'] },
+          { bn: 'কড়া করে এক কাপ চা', ro: 'kora kore ek kap cha', en: 'a strong cup of tea', alt: ['one strong tea', 'a cup of strong tea'], syl: 'kora kori ek kap sa' },
         ],
         chat: {
           with: 'Khala, at dinner',
@@ -191,6 +193,7 @@ export const unitsB: Unit[] = [
           { bn: 'আমি আসছি', ro: 'ami ashchi', en: "I'm coming", alt: ['i am coming', 'coming!', 'on my way'], syl: 'ami airam' },
           { bn: 'বৃষ্টি হচ্ছে', ro: 'brishti hocche', en: "it's raining", alt: ['it is raining'] },
           { bn: 'আমি বাংলা শিখছি', ro: 'ami Bangla shikhchi', en: "I'm learning Bangla", alt: ['i am learning bangla'] },
+          { bn: 'কিছু না, এমনি', ro: 'kichu na, emni', en: 'nothing, just because', alt: ['nothing much', 'no reason', 'nothing, just like that'], slang: true, tip: '**emni** means "just because". You\'ll hear it constantly.' },
         ],
       },
       {
@@ -283,6 +286,7 @@ export const unitsB: Unit[] = [
           { bn: 'একটু অপেক্ষা করুন', ro: 'ektu opekkha korun', en: 'please wait a moment', alt: ['wait a moment please', 'please wait a bit', 'wait a little'] },
           { bn: 'আমি দশ মিনিটে আসছি', ro: 'ami dosh minite ashchi', en: "I'll be there in ten minutes", alt: ["i'm coming in ten minutes", 'i am coming in 10 minutes'] },
           { bn: 'আমার সময় নেই', ro: 'amar shomoy nei', en: "I don't have time", alt: ['i have no time', 'i do not have time'], syl: 'amar shomoy nai' },
+          { bn: 'আসতেছি', ro: 'ashtechi', en: 'on my way!', alt: ["i'm coming", 'coming!'], slang: true, tip: 'Dhaka speech often says **-techi** instead of **-chi**: **ashtechi**, **khaitechi**. Fine with friends, a bit street for elders.' },
         ],
         chat: {
           with: 'Rafi, your cousin',

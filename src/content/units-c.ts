@@ -47,7 +47,7 @@ export const unitsC: Unit[] = [
           emoji: '👴🏽',
           scene: 'You\'ve just arrived at your mama\'s flat in Dhaka after a long flight.',
           lines: [
-            { who: 'them', bn: 'আরে, এসে গেছো! ফ্লাইট কেমন ছিল?', ro: 'are, eshe gecho! flight kemon chilo?', en: "Ah, you've made it! How was the flight?" },
+            { who: 'them', bn: 'আরে {name}, এসে গেছো! ফ্লাইট কেমন ছিল?', ro: 'are {name}, eshe gecho! flight kemon chilo?', en: "Ah {name}, you've made it! How was the flight?" },
             { who: 'you', bn: 'ভালো ছিল, মামা, কিন্তু অনেক লম্বা', ro: 'bhalo chilo, mama, kintu onek lomba', en: 'It was good, Mama, but very long', wrong: [{ ro: 'bala asil, mama', en: 'It was good, Mama (Sylheti)' }, { ro: 'ki holo?', en: 'What happened?' }] },
             { who: 'them', bn: 'তুমি আগে কখনো ঢাকায় এসেছো?', ro: 'tumi age kokhono Dhakay eshecho?', en: 'Have you been to Dhaka before?' },
             { who: 'you', bn: 'না, আগে কখনো ঢাকায় আসিনি', ro: 'na, age kokhono Dhakay ashini', en: "No, I've never been to Dhaka before", wrong: [{ ro: 'ami bhule gechi', en: "I've forgotten" }, { ro: 'o phone korechilo', en: 'He called' }] },
@@ -114,6 +114,7 @@ export const unitsC: Unit[] = [
           { bn: 'আস্তে চালান', ro: 'aste chalan', en: 'please drive slowly', alt: ['slow down', 'drive slowly'] },
           { bn: 'ডানে যান', ro: 'dane jan', en: 'turn right', alt: ['go right'] },
           { bn: 'এখানে থামুন', ro: 'ekhane thamun', en: 'stop here please', alt: ['stop here'] },
+          { bn: 'মামা, চলেন', ro: 'mama, cholen', en: "let's go, mate", alt: ["let's go", 'go on then', 'off we go'], slang: true },
         ],
         chat: {
           with: 'A rickshaw-wala',
@@ -153,6 +154,7 @@ export const unitsC: Unit[] = [
           { bn: 'আমার ঠান্ডা লাগছে', ro: 'amar thanda lagche', en: "I'm cold", alt: ['i am cold', 'i feel cold'] },
           { bn: 'আমার ভয় লাগছে', ro: 'amar bhoy lagche', en: "I'm scared", alt: ['i am scared', "i'm afraid", 'i am afraid'] },
           { bn: 'তোমার কী হয়েছে?', ro: 'tomar ki hoyeche?', en: "what's wrong?", alt: ['what is wrong?', 'what happened to you?', "what's the matter?"], syl: 'tumar kita oise?' },
+          { bn: 'মেজাজ খারাপ', ro: 'mejaj kharap', en: "I'm in a bad mood", alt: ["i'm annoyed", 'bad mood', "i'm in a mood"], slang: true },
         ],
       },
       {
@@ -212,6 +214,7 @@ export const unitsC: Unit[] = [
           { bn: 'কোনো ব্যাপার না', ro: 'kono byapar na', en: "it doesn't matter", alt: ['no worries', 'never mind', 'it does not matter'] },
           { bn: 'আমিও', ro: 'amio', en: 'me too', alt: ['me as well'] },
           { bn: 'আমি জানতাম না', ro: 'ami jantam na', en: "I didn't know", alt: ['i did not know'], syl: 'ami zantam na' },
+          { bn: 'হ, ঠিক', ro: 'ho, thik', en: 'yeah, true', alt: ['yeah, right', 'yep, true'], slang: true, tip: '**ho** is a casual "yeah". Not for your nani!' },
         ],
       },
       {

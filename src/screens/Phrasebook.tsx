@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { phraseKey, units } from '../content';
+import { personalisePhrase, phraseKey, units } from '../content';
 import { norm } from '../engine/text';
-import { BnText, capital, Rich, Say } from '../components/ui';
+import { BnText, capital, Rich, Say, SlangTag } from '../components/ui';
 import { useStore } from '../store';
 
 /** Every phrase in the course, searchable, with audio: a pocket phrasebook for real conversations. */
@@ -9,6 +9,7 @@ export function Phrasebook() {
   const { progress } = useStore();
   const [q, setQ] = useState('');
   const [learnedOnly, setLearnedOnly] = useState(false);
+  const [slangOnly, setSlangOnly] = useState(false);
   const [view, setView] = useState<'phrases' | 'grammar'>('phrases');
   const query = norm(q);
 
@@ -19,11 +20,13 @@ export function Phrasebook() {
           unit,
           phrases: unit.lessons
             .flatMap((l) => l.phrases)
+            .map((p) => personalisePhrase(p, progress.profile, phraseKey(p)))
             .filter((p) => !learnedOnly || progress.phrases[phraseKey(p)])
+            .filter((p) => !slangOnly || p.slang)
             .filter((p) => !query || [p.ro, p.en, p.syl ?? '', ...(p.alt ?? [])].some((s) => norm(s).includes(query))),
         }))
         .filter((s) => s.phrases.length),
-    [query, learnedOnly, progress.phrases],
+    [query, learnedOnly, slangOnly, progress.phrases, progress.profile],
   );
 
   const toggle = (
@@ -78,6 +81,9 @@ export function Phrasebook() {
       <label className="check-row small">
         <input type="checkbox" checked={learnedOnly} onChange={(e) => setLearnedOnly(e.target.checked)} /> Only phrases I've learned
       </label>
+      <label className="check-row small">
+        <input type="checkbox" checked={slangOnly} onChange={(e) => setSlangOnly(e.target.checked)} /> 🔥 Only slang
+      </label>
       {!sections.length && <p className="muted center">Nothing found.</p>}
       {sections.map(({ unit, phrases }) => (
         <section key={unit.id} className="pb-section">
@@ -93,6 +99,7 @@ export function Phrasebook() {
                   <BnText p={p} />
                   <div className="small muted">{capital(p.en)}</div>
                   {p.syl && <div className="small syl-inline">Sylheti: {p.syl}</div>}
+                  {p.slang && <SlangTag />}
                 </div>
                 {stat && (
                   <span className="strength" title="How well you know it">

@@ -4,7 +4,7 @@ import type { Exercise } from '../engine/session';
 import { bnWords, shuffle, speechMatches, tiles } from '../engine/text';
 import { sfx } from '../sound';
 import { canListen, listen, ListenError, speak, stopListening } from '../speech';
-import { BnText, capital, Rich, Say, SylBridge } from './ui';
+import { BnText, capital, Rich, Say, SlangTag, SylBridge } from './ui';
 
 /** Romanised word → Bengali word, from phrases where the words line up one to one. */
 const wordAudio = (() => {
@@ -104,6 +104,11 @@ function IntroCard({ p }: { p: Phrase }) {
         <BnText p={p} className="huge" />
       </div>
       <div className="intro-en">{capital(p.en)}</div>
+      {p.slang && (
+        <div className="center">
+          <SlangTag />
+        </div>
+      )}
       {p.syl && <SylBridge syl={p.syl} />}
       {p.tip && (
         <p className="tip">
@@ -207,6 +212,12 @@ function SylhetiSwap({ p, options, locked, onChange, ex }: ExerciseProps & { p: 
 function Builder({ p, bank, mode, locked, onChange, onCantListen }: ExerciseProps & { p: Phrase; bank: string[]; mode: 'build-bn' | 'build-en' | 'listen-build' }) {
   const [chosen, setChosen] = useState<number[]>([]);
   const banglaTiles = mode !== 'build-en';
+  // This phrase's own words first, so personalised words (like your name) have audio too.
+  const ownWords = useMemo(() => {
+    const ro = tiles(p.ro);
+    const bn = bnWords(p.bn);
+    return new Map(ro.length === bn.length ? ro.map((w, i) => [w.toLowerCase(), bn[i]] as const) : []);
+  }, [p]);
   useEffect(() => {
     if (mode !== 'build-bn') {
       const t = setTimeout(() => void speak(p.bn), 250);
@@ -225,7 +236,7 @@ function Builder({ p, bank, mode, locked, onChange, onCantListen }: ExerciseProp
       update(chosen.filter((c) => c !== i));
     } else {
       update([...chosen, i]);
-      const bn = banglaTiles && wordAudio.get(bank[i].toLowerCase());
+      const bn = banglaTiles && (ownWords.get(bank[i].toLowerCase()) ?? wordAudio.get(bank[i].toLowerCase()));
       if (bn) void speak(bn);
     }
   };

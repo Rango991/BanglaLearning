@@ -50,6 +50,11 @@ export function BnText({ p, className = '' }: { p: Pick<Phrase, 'ro' | 'bn'>; cl
   );
 }
 
+/** Marks casual/slang phrases: fine with mates, not with elders. */
+export function SlangTag() {
+  return <span className="slang-tag">🔥 Slang · mates only</span>;
+}
+
 export function SylBridge({ syl }: { syl: string }) {
   return (
     <div className="bridge">
